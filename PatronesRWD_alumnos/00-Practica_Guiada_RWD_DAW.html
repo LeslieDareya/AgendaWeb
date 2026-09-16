@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Práctica guiada · Patrones RWD · DAW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#D97706;--bright:#F59E0B;--deep:#92400E;--soft:#FDE8C8;--soft2:#FEF6E8;
+    --ink:#2A2630;--ink2:#5C5763;--line:#E6DAC4;--muted:#7A6E58;--altrow:#FDFBF6;
+    --dark:#1C1917;--code:#E8DCC8;--hl:#F4B860;--grad:linear-gradient(135deg,#2f1e12 0%,#904212 50%,#D97706 110%);
+  }
+  *{box-sizing:border-box;}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;color:var(--ink2);line-height:1.65;margin:0;background:#F7F2E9;padding-bottom:60px;}
+  .wrap{max-width:900px;margin:0 auto;padding:0 16px;}
+  header.hero{background:var(--grad);color:#fff;position:relative;overflow:hidden;padding:30px 0 26px;}
+  header.hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.07) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;}
+  .kicker{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--hl);font-weight:600;margin-bottom:8px;}
+  header.hero h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em;margin:0 0 8px;line-height:1.1;}
+  header.hero p{margin:0;max-width:640px;font-size:13.5px;color:rgba(255,255,255,0.85);}
+  .seal{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(244,184,96,0.4);font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--hl);margin-bottom:14px;}
+
+  section.fase{background:#fff;border:1px solid var(--line);border-radius:14px;margin:16px 0;overflow:hidden;}
+  .fase-head{display:flex;align-items:center;gap:12px;padding:15px 18px;cursor:pointer;user-select:none;}
+  .fase-head:hover{background:var(--soft2);}
+  .badge{flex-shrink:0;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;color:#fff;background:var(--deep);border-radius:8px;padding:5px 10px;}
+  .fase-head h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--ink);margin:0;flex:1;}
+  .chev{transition:transform .25s;color:var(--accent);font-size:18px;}
+  .fase.collapsed .chev{transform:rotate(-90deg);}
+  .fase.collapsed .fase-body{display:none;}
+  .fase-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+
+  .lbl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--deep);font-weight:600;margin:16px 0 6px;}
+  p code,li code,td code,.obj code{background:var(--soft2);padding:1px 6px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:0.9em;color:var(--deep);}
+  .obj{background:var(--soft);border-left:3px solid var(--accent);border-radius:9px;padding:11px 15px;font-size:13.5px;color:var(--ink);margin:14px 0;}
+  ul,ol{padding-left:20px;} li{margin-bottom:5px;}
+  .note{border-radius:10px;padding:11px 15px;font-size:13px;margin:12px 0;}
+  .note-ok{background:#E9F7EE;border-left:4px solid #16A34A;} .note-ok b{color:#166534;}
+  .note-tip{background:var(--soft2);border-left:4px solid var(--accent);} .note-tip b{color:var(--deep);}
+
+  table.cro{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0 8px;}
+  table.cro th{background:var(--deep);color:#fff;text-align:left;padding:8px 10px;border:1px solid var(--deep);}
+  table.cro td{padding:7px 10px;border:1px solid var(--line);vertical-align:top;}
+  table.cro tr:nth-child(even) td{background:var(--altrow);}
+  .tiempo{font-family:'IBM Plex Mono',monospace;color:var(--accent);font-weight:600;white-space:nowrap;}
+
+  .code{position:relative;background:var(--dark);color:var(--code);font-family:'IBM Plex Mono',monospace;font-size:12.5px;border-radius:9px;padding:14px;margin:8px 0 12px;overflow-x:auto;white-space:pre;line-height:1.5;}
+  .code .sel{color:#82AAFF;} .code .pr{color:var(--hl);} .code .vl{color:#A7F3D0;} .code .cm{color:#9A8C70;} .code .at{color:#C792EA;}
+  .copy{position:absolute;top:8px;right:8px;background:#3a322c;color:#E8DCC8;border:none;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:4px 9px;cursor:pointer;}
+  .copy:hover{background:#4a4039;}
+
+  .pat{border:1px solid var(--line);border-radius:11px;margin:12px 0;overflow:hidden;}
+  .pat-h{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--soft2);}
+  .pat-n{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--deep);font-size:14px;}
+  .chip{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;}
+  .chip-grid{background:#E0F2FE;color:#075985;} .chip-flex{background:#DCFCE7;color:#166534;}
+  .pat-b{padding:12px 14px;}
+  details{margin-top:8px;} summary{cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--accent);list-style:none;padding:5px 0;}
+  summary::-webkit-details-marker{display:none;} summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  footer{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-top:26px;}
+  @media print{.copy{display:none;}.fase.collapsed .fase-body{display:block;}details{display:block;}details>*{display:block;}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="seal">&lt;/&gt;</div>
+    <div class="kicker">Práctica guiada &middot; 2 horas &middot; HTML/CSS</div>
+    <h1>Patrones de dise&ntilde;o responsivo (RWD)</h1>
+    <p>Aprende los patrones cl&aacute;sicos de <b>Responsive Web Design</b> completando plantillas reales, con <b>CSS Grid</b> y <b>Flexbox</b> lado a lado. Desarrollo de Aplicaciones Web &middot; Unidad 2.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ════ CÓMO FUNCIONA ════ -->
+  <section class="fase">
+    <div class="fase-head"><span class="badge">Inicio</span><h2>Antes de empezar &middot; c&oacute;mo funciona el material</h2><span class="chev">&#9660;</span></div>
+    <div class="fase-body">
+      <div class="obj"><b>Objetivo de la sesi&oacute;n:</b> maquetar los principales <b>patrones RWD</b> haciendo que el mismo contenido se reacomode en <b>m&oacute;vil, tableta y escritorio</b>, usando <code>@media</code>, <b>CSS Grid</b> y <b>Flexbox</b>.</div>
+      <div class="lbl">Qu&eacute; necesitas</div>
+      <ul>
+        <li><b>VS Code</b> con la extensi&oacute;n <b>Live Server</b> (para ver los cambios al instante).</li>
+        <li>La carpeta <code>PatronesRWD</code> con las 14 plantillas.</li>
+        <li>Las <b>DevTools</b> del navegador (F12) en <b>modo responsive</b> (icono de celular) para probar tama&ntilde;os.</li>
+      </ul>
+      <div class="lbl">C&oacute;mo est&aacute;n hechas las plantillas</div>
+      <p>Cada carpeta tiene <code>index.html</code> (ya con contenido) y <code>css/styles.css</code> con los estilos base. Al final del CSS ver&aacute;s este marcador:</p>
+      <div class="code"><button class="copy">copiar</button><span class="cm">/** CODIGO AQUI **/</span></div>
+      <p><b>Ah&iacute;, y solo ah&iacute;, escribes tu c&oacute;digo</b> del layout. No borres lo de arriba.</p>
+      <div class="note note-tip"><b>Regla mobile-first:</b> el dise&ntilde;o base (sin media query) es para <b>m&oacute;vil</b>: todo en <b>una columna</b>, apilado. Con <code>@media (min-width: ...)</code> vas <i>agregando</i> columnas para pantallas m&aacute;s grandes.</div>
+    </div>
+  </section>
+
+  <!-- ════ CRONOGRAMA ════ -->
+  <section class="fase">
+    <div class="fase-head"><span class="badge">Plan</span><h2>Cronograma de las 2 horas</h2><span class="chev">&#9660;</span></div>
+    <div class="fase-body">
+      <table class="cro">
+        <tr><th style="width:20%;">Tiempo</th><th>Actividad</th></tr>
+        <tr><td class="tiempo">0:00 – 0:15</td><td><b>Encuadre.</b> Qu&eacute; es RWD, los patrones, mobile-first, <code>@media</code>, y Grid vs Flexbox. Abrir Live Server + DevTools responsive.</td></tr>
+        <tr><td class="tiempo">0:15 – 0:40</td><td><b>Demo guiada (profesor).</b> Resolvemos juntos <b>2 columnas iguales</b> en Grid (01) y su gemelo Flexbox (02).</td></tr>
+        <tr><td class="tiempo">0:40 – 1:35</td><td><b>Pr&aacute;ctica (alumnos).</b> Resuelven en orden: 3 columnas, Column Drop y Con sidebar &mdash; cada uno en Grid y Flexbox. Checkpoints del profesor.</td></tr>
+        <tr><td class="tiempo">1:35 – 1:50</td><td><b>Retos.</b> Para quien avance: Layout Shifter, Mostly Fluid, Tiny Tweaks.</td></tr>
+        <tr><td class="tiempo">1:50 – 2:00</td><td><b>Cierre.</b> ¿Cu&aacute;ndo Grid y cu&aacute;ndo Flexbox? Dudas y entrega de evidencia.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ════ CONCEPTOS ════ -->
+  <section class="fase">
+    <div class="fase-head"><span class="badge">Base</span><h2>Las 3 herramientas que usar&aacute;s</h2><span class="chev">&#9660;</span></div>
+    <div class="fase-body">
+      <div class="lbl">1 &middot; Media query (el interruptor por ancho)</div>
+      <div class="code"><button class="copy">copiar</button><span class="cm">/* Se aplica SOLO si la pantalla mide 768px o más */</span>
+<span class="at">@media</span> (min-width: 768px) {
+  .contenedor { <span class="cm">/* ...columnas aquí... */</span> }
+}</div>
+      <div class="lbl">2 &middot; CSS Grid (rejilla en 2 dimensiones)</div>
+      <div class="code"><button class="copy">copiar</button>.contenedor {
+  <span class="pr">display</span>: <span class="vl">grid</span>;
+  <span class="pr">grid-template-columns</span>: <span class="vl">1fr 1fr</span>;   <span class="cm">/* 2 columnas iguales */</span>
+  <span class="pr">gap</span>: <span class="vl">20px</span>;                 <span class="cm">/* separación */</span>
+}</div>
+      <div class="lbl">3 &middot; Flexbox (acomodo en 1 dimensión)</div>
+      <div class="code"><button class="copy">copiar</button>.contenedor {
+  <span class="pr">display</span>: <span class="vl">flex</span>;
+  <span class="pr">gap</span>: <span class="vl">20px</span>;
+}
+.entrada-blog { <span class="pr">flex</span>: <span class="vl">1</span>; }   <span class="cm">/* cada hijo crece por igual */</span></div>
+      <div class="note note-ok"><b>Regla mental:</b> <b>Grid</b> cuando defines filas <i>y</i> columnas (rejillas); <b>Flexbox</b> cuando acomodas en <i>una</i> línea (fila o columna).</div>
+    </div>
+  </section>
+
+  <!-- ════ DEMO / PRÁCTICA ════ -->
+  <section class="fase">
+    <div class="fase-head"><span class="badge">Demo</span><h2>1 &middot; Dos columnas iguales <span style="font-weight:400;color:var(--muted);font-size:13px;">(lo hacemos juntos)</span></h2><span class="chev">&#9660;</span></div>
+    <div class="fase-body">
+      <p>Dos entradas de blog (<code>.entrada-blog</code>) dentro de <code>.contenedor</code>. En m&oacute;vil se apilan; desde tableta, dos columnas iguales.</p>
+
+      <div class="pat">
+        <div class="pat-h"><span class="pat-n">01</span><span class="chip chip-grid">CSS Grid</span></div>
+        <div class="pat-b">
+          <p style="margin:0 0 6px;font-size:13px;"><b>Pista:</b> <code>display:grid</code> + <code>grid-template-columns: 1fr 1fr</code> dentro de la media query.</p>
+          <details><summary>Ver soluci&oacute;n</summary>
+          <div class="code"><button class="copy">copiar</button><span class="at">@media</span> (min-width: 768px) {
+  .contenedor {
+    <span class="pr">display</span>: <span class="vl">grid</span>;
+    <span class="pr">grid-template-columns</span>: <span class="vl">repeat(2, 1fr)</span>;
+    <span class="pr">gap</span>: <span class="vl">20px</span>;
+  }
+}</div></details>
+        </div>
+      </div>
+
+      <div class="pat">
+        <div class="pat-h"><span class="pat-n">02</span><span class="chip chip-flex">Flexbox</span></div>
+        <div class="pat-b">
+          <p style="margin:0 0 6px;font-size:13px;"><b>Pista:</b> <code>display:flex</code> en el contenedor y <code>flex:1</code> en cada hijo.</p>
+          <details><summary>Ver soluci&oacute;n</summary>
+          <div class="code"><button class="copy">copiar</button><span class="at">@media</span> (min-width: 768px) {
+  .contenedor { <span class="pr">display</span>: <span class="vl">flex</span>; <span class="pr">gap</span>: <span class="vl">20px</span>; }
+  .entrada-blog { <span class="pr">flex</span>: <span class="vl">1</span>; }
+}</div></details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ 3 COLUMNAS ════ -->
+  <section class="fase">
+    <div class="fase-head"><span class="badge">Práctica</span><h2>2 &middot; Tres columnas</h2><span class="chev">&#9660;</span></div>
+    <div class="fase-body">
+      <p><b>Iguales</b> (03/04): tres <code>.entrada-blog</code> del mismo ancho. <b>Desiguales</b> (05/06): un <code>main</code> ancho + dos <code>aside</code> angostos.</p>
+
+      <div class="pat"><div class="pat-h"><span class="pat-n">03</span><span class="chip chip-grid">3 iguales · Grid</span></div><div class="pat-b">
+        <details><summary>Ver soluci&oacute;n</summary><div class="code"><button class="copy">copiar</button><span class="at">@media</span> (min-width: 768px) {
+  .contenedor {
+    <span class="pr">display</span>: <span class="vl">grid</span>;
+    <span class="pr">grid-template-columns</span>: <span class="vl">repeat(3, 1fr)</span>;
+    <span class="pr">gap</span>: <span class="vl">20px</span>;
+  }
+}</div></details></div></div>
+
+      <div class="pat"><div class="pat-h"><span class="pat-n">04</span><span class="chip chip-flex">3 iguales · Flexbox</span></div><div class="pat-b">
+        <details><summary>Ver soluci&oacute;n</summary><div class="code"><button class="copy">copiar</button><span class="at">@media</span> (min-width: 768px) {
+  .contenedor { <span class="pr">display</span>: <span class="vl">flex</span>; <span class="pr">gap</span>: <span class="vl">20px</span>; }
+  .entrada-blog { <span class="pr">flex</span>: <span class="vl">1</span>; }
+}</div></details></div></div>
+
+      <div class="pat"><div class="pat-h"><span class="pat-n">05</span><span class="chip chip-grid">Desiguales · Grid</span></div><div class="pat-b">
+        <p style="margin:0 0 6px;font-size:13px;"><b>Pista:</b> con <code>fr</code> das proporciones. El <code>main</code> el doble que cada <code>aside</code>.</p>
+        <details><summary>Ver soluci&oacute;n</summary><div class="code"><button class="copy">copiar</button><span class="at">@media</span> (min-width: 768px) {
+  .contenedor {
+    <span class="pr">display</span>: <span class="vl">grid</span>;
+    <span class="pr">grid-template-columns</span>: <span class="vl">2fr 1fr 1fr</span>;
+    <span class="pr">gap</span>: <span class="vl">20px</span>;
+  }
+}</div></details></div></div>
+
+      <div class="pat"><div class="pat-h"><span class="pat-n">06</span><span class="chip chip-flex">Desiguales · Flexbox</span></div><div class="pat-b">
+        <details><summary>Ver soluci&oacute;n</summary><div class="code"><button class="copy">copiar</button><span class="at">@media</span> (min-width: 768px) {
+  .contenedor { <span class="pr">display</span>: <span class="vl">flex</span>; <span class="pr">gap</span>: <span class="vl">20px</span>; }
+  main  { <span class="pr">flex</span>: <span class="vl">2</span>; }
+  aside { <span class="pr">flex</span>: <span class="vl">1</span>; }
+}</div></details></div></div>
+    </div>
+  </section>
+
+  <!-- ════ COLUMN DROP ════ -->
+  <section class="fase">
+    <div class="fase-head"><span class="badge">Práctica</span><h2>3 &middot; Column Drop</h2><span class="chev">&#9660;</span></div>
+    <div class="fase-body">
+      <p>El patrón que <b>va soltando columnas</b> al encoger: escritorio = 3 columnas; tableta = una arriba a todo el ancho y dos abajo; m&oacute;vil = apiladas. Estructura: <code>main + aside + aside</code>. Usa <b>dos</b> media queries.</p>
+
+      <div class="pat"><div class="pat-h"><span class="pat-n">07</span><span class="chip chip-grid">CSS Grid</span></div><div class="pat-b">
+        <details><summary>Ver soluci&oacute;n</summary><div class="code"><button class="copy">copiar</button><span class="cm">/* Tableta: 2 columnas (main arriba a todo el ancho) */</span>
+<span class="at">@media</span> (min-width: 768px) {
+  .contenedor {
+    <span class="pr">display</span>: <span class="vl">grid</span>;
+    <span class="pr">grid-template-columns</span>: <span class="vl">repeat(2, 1fr)</span>;
+    <span class="pr">gap</span>: <span class="vl">20px</span>;
+  }
+  main { <span class="pr">grid-column</span>: <span class="vl">1 / 3</span>; }
+}
+<span class="cm">/* Escritorio: 3 columnas en una fila */</span>
+<span class="at">@media</span> (min-width: 992px) {
+  .contenedor { <span class="pr">grid-template-columns</span>: <span class="vl">repeat(3, 1fr)</span>; }
+  main { <span class="pr">grid-column</span>: <span class="vl">auto</span>; }
+}</div></details></div></div>
+
+      <div class="pat"><div class="pat-h"><span class="pat-n">08</span><span class="chip chip-flex">Flexbox</span></div><div class="pat-b">
+        <p style="margin:0 0 6px;font-size:13px;"><b>Pista:</b> <code>flex-wrap:wrap</code> permite que bajen; controla el ancho con <code>flex-basis</code>.</p>
+        <details><summary>Ver soluci&oacute;n</summary><div class="code"><button class="copy">copiar</button><span class="at">@media</span> (min-width: 768px) {
+  .contenedor { <span class="pr">display</span>: <span class="vl">flex</span>; <span class="pr">flex-wrap</span>: <span class="vl">wrap</span>; <span class="pr">gap</span>: <span class="vl">20px</span>; }
+  main  { <span class="pr">flex-basis</span>: <span class="vl">100%</span>; }
+  aside { <span class="pr">flex</span>: <span class="vl">1</span>; }
+}
+<span class="at">@media</span> (min-width: 992px) {
+  main { <span class="pr">flex</span>: <span class="vl">1</span>; <span class="pr">flex-basis</span>: <span class="vl">0</span>; }
+}</div></details></div></div>
+    </div>
+  </section>
+
+  <!-- ════ SIDEBAR ════ -->
+  <section class="fase">
+    <div class="fase-head"><span class="badge">Práctica</span><h2>4 &middot; Con barra lateral (sidebar)</h2><span class="chev">&#9660;</span></div>
+    <div class="fase-body">
+      <p>Contenido principal ancho (<code>article</code>) + barra lateral angosta (<code>aside</code>). En m&oacute;vil, la barra baja debajo.</p>
+
+      <div class="pat"><div class="pat-h"><span class="pat-n">09</span><span class="chip chip-grid">CSS Grid</span></div><div class="pat-b">
+        <details><summary>Ver soluci&oacute;n</summary><div class="code"><button class="copy">copiar</button><span class="at">@media</span> (min-width: 768px) {
+  .contenedor {
+    <span class="pr">display</span>: <span class="vl">grid</span>;
+    <span class="pr">grid-template-columns</span>: <span class="vl">3fr 1fr</span>;
+    <span class="pr">gap</span>: <span class="vl">20px</span>;
+  }
+}</div></details></div></div>
+
+      <div class="pat"><div class="pat-h"><span class="pat-n">10</span><span class="chip chip-flex">Flexbox</span></div><div class="pat-b">
+        <details><summary>Ver soluci&oacute;n</summary><div class="code"><button class="copy">copiar</button><span class="at">@media</span> (min-width: 768px) {
+  .contenedor { <span class="pr">display</span>: <span class="vl">flex</span>; <span class="pr">gap</span>: <span class="vl">20px</span>; }
+  article { <span class="pr">flex</span>: <span class="vl">3</span>; }
+  aside   { <span class="pr">flex</span>: <span class="vl">1</span>; }
+}</div></details></div></div>
+    </div>
+  </section>
+
+  <!-- ════ RETOS ════ -->
+  <section class="fase collapsed">
+    <div class="fase-head"><span class="badge">Retos</span><h2>5 &middot; Retos para quien avance</h2><span class="chev">&#9660;</span></div>
+    <div class="fase-body">
+      <p>Sin soluci&oacute;n a la vista: apl&iacute;ca lo aprendido e investiga lo que falte.</p>
+      <ul>
+        <li><b>11/12 · Layout Shifter</b> &mdash; el contenido <b>cambia de orden</b> entre m&oacute;vil y escritorio. Pista: en Grid usa colocaci&oacute;n por l&iacute;neas o <code>grid-template-areas</code>; en Flexbox usa <code>order</code>.</li>
+        <li><b>13 · Mostly Fluid</b> &mdash; contenido <b>fluido</b> con <code>max-width</code> en el contenedor y m&aacute;rgenes autom&aacute;ticos; casi no cambia, solo se centra al crecer.</li>
+        <li><b>14 · Tiny Tweaks</b> &mdash; <b>ajustes m&iacute;nimos</b>: solo cambian <code>font-size</code>, <code>padding</code> o interlineado por breakpoint (una sola columna siempre).</li>
+      </ul>
+      <div class="note note-tip"><b>Extra:</b> reemplaza los breakpoints fijos por <b>flujo l&iacute;quido</b> con <code>grid-template-columns: repeat(auto-fit, minmax(250px, 1fr))</code> &mdash; ¡se reacomoda solo sin media queries!</div>
+    </div>
+  </section>
+
+  <!-- ════ CIERRE ════ -->
+  <section class="fase">
+    <div class="fase-head"><span class="badge">Cierre</span><h2>Evidencia y reflexi&oacute;n</h2><span class="chev">&#9660;</span></div>
+    <div class="fase-body">
+      <div class="lbl">Qu&eacute; entregar</div>
+      <ul>
+        <li>Los <code>styles.css</code> completados de los patrones <b>01 al 10</b> (m&iacute;nimo).</li>
+        <li><b>Capturas</b> de al menos 3 patrones en <b>m&oacute;vil</b> y en <b>escritorio</b> (DevTools responsive).</li>
+        <li>Una frase de reflexi&oacute;n: <i>¿en qu&eacute; caso te result&oacute; m&aacute;s c&oacute;modo Grid y en cu&aacute;l Flexbox?</i></li>
+      </ul>
+      <div class="note note-ok"><b>Lo que te llevas:</b> el mismo layout se puede lograr con Grid o Flexbox; <b>Grid</b> brilla en rejillas y colocaci&oacute;n exacta, <b>Flexbox</b> en acomodos de una l&iacute;nea. Y todo patrón responsivo nace <b>mobile-first</b>.</div>
+      <p style="font-size:12.5px;color:var(--muted);">Este material conecta directo con la <b>maqueta de AgendaWeb</b> (Pr&aacute;ctica 2): ah&iacute; aplicas estos mismos patrones a tu proyecto real.</p>
+    </div>
+  </section>
+
+  <footer>Desarrollo de Aplicaciones Web &middot; Práctica guiada de Patrones RWD &middot; 2 horas</footer>
+</div>
+
+<script>
+(function(){
+  document.querySelectorAll('.fase-head').forEach(h=>h.addEventListener('click',e=>{ if(e.target.closest('a'))return; h.parentElement.classList.toggle('collapsed'); }));
+  document.querySelectorAll('.copy').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const host=btn.closest('.code'); const clone=host.cloneNode(true);
+      clone.querySelectorAll('.copy').forEach(b=>b.remove());
+      try{ await navigator.clipboard.writeText(clone.innerText.trim()); btn.textContent='¡copiado!'; }
+      catch(e){ btn.textContent='copia manual'; }
+      setTimeout(()=>btn.textContent='copiar',1200);
+    });
+  });
+})();
+</script>
+</body>
+</html>
